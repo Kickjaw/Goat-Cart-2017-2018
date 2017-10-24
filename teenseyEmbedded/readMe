@@ -7,11 +7,11 @@ It is for the teensey 3.5 and contains:
   power LED for 5V
   power LED for 3.3V
   1 CAN transever
-  2  SPI
-  3Tx/Rx
+  2 SPI
   2 I2C
-  18 digital
-  12 Analog
+  3 Tx & Rx
   7 PWM
+  18 Digital
+  12 Analog
 
 The teensey can be powered via the USB or theough the 5V on board.
