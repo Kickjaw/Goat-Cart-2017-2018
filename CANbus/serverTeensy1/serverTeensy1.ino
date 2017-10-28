@@ -4,6 +4,7 @@
 //led pin number 
 int led = 13;
 int stop_cart = 0; 
+int move_cart = 1; 
 int turn_angle = 20; 
 int counter = 2; 
 
@@ -16,6 +17,7 @@ int counter = 2;
 #define ID_STEERING_TURN_RIGHT 0x25
 #define ID_STEERING_TURN_LEFT 0x026
 #define ID_STEERING_GO_STRAIGHT 0x024
+#define ID_STEERING_SET_UP 0x23
 
 //odometry related messages
 #define ID_DISTANCE_TRAVELED 0x09
@@ -47,6 +49,10 @@ turn_left.id = ID_STEERING_TURN_LEFT;
 //turn_left.buf = 0x0001; 
 static CAN_message_t steering_straight; 
 steering_straight.id = ID_STEERING_GO_STRAIGHT;
+//steering_straight.len = 1; 
+//steering_straight.buf = 0x0001; 
+static CAN_message_t steering_setup; 
+steering_straight.id = ID_STEERING_SET_UP;
 //steering_straight.len = 1; 
 //steering_straight.buf = 0x0001; 
 
@@ -89,8 +95,13 @@ void setup(void)
 void loop(void)
 {
   while(counter> 0){ 
+    if(move_cart) {  
+     //do not send more messages after reaching the desired speed
+     move_cart = 0; 
     CANbus.write(speed_increase); //send command to start moving the cart forfard  
     CANbus.write(speed_increase); //go to second velocity 
+    }
+
     //while there is at least one receive frame waiting -- constantly receiving odometry   
       if (CANbus.available())  {
         CANbus.read(rxmsg);
@@ -100,7 +111,7 @@ void loop(void)
           //check if it reached the distance to stop (DEMO) 
           //note: I am putting a range just in case it never gets the exact number
           if (((rxmsg.buf[0] >= 5) && (rxmsg.buf[0] <= 7)) || ((rxmsg.buf[0] >= 14)){ 
-            stop_cart = 1; 
+            stop_cart = 1;  
           }
         }
     }
@@ -115,7 +126,8 @@ void loop(void)
         CANbus.write(turn_left);
         turn_angle--; 
       }
-      delay(60000);  
+      delay(60000); 
+      move_cart = 1;  
     }
   }
 }
