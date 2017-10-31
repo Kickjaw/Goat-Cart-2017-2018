@@ -22,7 +22,6 @@ Serial Monitor is Enabled on 9600 Baud Rate for Monitoring Value of Variable "va
  
 byte throttle_val = 255;
 byte brake_val = 128;
-byte bothPots = B10101011; //bytes to select both pots
 int incomingByte; //user input 
 int input; //case for switch statment to select which pot to use and what to set the motor to
  
@@ -34,7 +33,7 @@ void setup() {
 void loop() {
   
   Wire.beginTransmission(0x28);
-  Wire.write(bothPots);
+  Wire.write(B10101001);
   Wire.write(brake_val);
   Wire.write(throttle_val);
   Wire.endTransmission();
@@ -42,10 +41,9 @@ void loop() {
   if (Serial.available() > 0) {
 
     incomingByte = Serial.read();
-
-    input = incomingByte;
+    
     Serial.println(incomingByte);
-    switch(input) {
+    switch(incomingByte) {
       case '1': //brake motor off
         brake_val = 128;
         throttle_val = 255;
@@ -86,4 +84,3 @@ void loop() {
    }//end if serial avail
   delay(100);
 }
-
