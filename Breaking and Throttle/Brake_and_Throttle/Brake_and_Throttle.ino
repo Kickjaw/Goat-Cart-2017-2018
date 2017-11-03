@@ -20,23 +20,32 @@ Serial Monitor is Enabled on 9600 Baud Rate for Monitoring Value of Variable "va
 */
  
 #include <Wire.h>
+#include <Servo.h>
+
+Servo myservo;
+
+//pins
+const int ledPin = 13;
+const int steerPin = 35;
+
+int brakeSpeed = 90;
+
  
 byte throttle_val = 255;
-byte brake_val = 128;
-byte bothPots = B10101001; //bytes to select both pots
+byte pot0 = B10101001; //bytes to select both pots
 int incomingByte; //user input 
 int input; //case for switch statment to select which pot to use and what to set the motor to
  
 void setup() {
   Wire.begin();
   Serial.begin(9600);
+  myservo.attach(steerPin); // Use PWM pin 14 to control Sabertooth.
 }
  
 void loop() {
   
   Wire.beginTransmission(0x28);
-  Wire.write(bothPots);
-  Wire.write(brake_val);
+  Wire.write(pot0);
   Wire.write(throttle_val);
   Wire.endTransmission();
  
@@ -48,41 +57,40 @@ void loop() {
     Serial.println(incomingByte);
     switch(input) {
       case '1': //brake motor off
-        brake_val = 128;
+        brakeSpeed = 90;
         throttle_val = 255;
         Serial.println("Brake motor off");
         break;
         
       case '2': //brake motor full forward
-        brake_val = 0;
+        brakeSpeed = 180;
         throttle_val = 255;
         Serial.println("Brake full forward");
         break;
         
       case '3': //brake motor full reverse
-        brake_val = 255;
+        brakeSpeed = 0;
         throttle_val = 255;
         Serial.println("Brake full reverse");
         break;
         
       case '4': //throttle off
-        brake_val = 128;
         throttle_val = 255;
         Serial.println("Throttle off");
         break;
         
       case '5': //throttle increment up
-        brake_val = 128;
         throttle_val -= 10;
         Serial.println("Throttle increment up");
         break;
         
       case '6': //throttle increment down
-        brake_val = 128;
         throttle_val += 10;
         Serial.println("Throttle increment down");
         break;
     }
+    Serial.println(brakeSpeed);
+    myservo.write(brakeSpeed);
     delay(100);
    }//end if serial avail
   delay(100);
