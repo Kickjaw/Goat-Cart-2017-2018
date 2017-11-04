@@ -54,7 +54,6 @@ void loop() {
     incomingByte = Serial.read();
 
     input = incomingByte;
-    Serial.println(incomingByte);
     switch(input) {
       case '1': //brake motor off
         brakeSpeed = 90;
@@ -75,22 +74,26 @@ void loop() {
         break;
         
       case '4': //throttle off
+        brakeSpeed = 90;
         throttle_val = 255;
         Serial.println("Throttle off");
         break;
         
       case '5': //throttle increment up
+        brakeSpeed = 90;
         throttle_val -= 10;
         Serial.println("Throttle increment up");
         break;
         
       case '6': //throttle increment down
+        brakeSpeed = 90;
         throttle_val += 10;
         Serial.println("Throttle increment down");
         break;
     }
     Serial.println(brakeSpeed);
     myservo.write(brakeSpeed);
+    digitalWrite(ledPin, HIGH);
     delay(100);
    }//end if serial avail
   delay(100);
