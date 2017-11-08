@@ -84,6 +84,7 @@ void setup(void)
   delay(1000);
   Serial.println(F("Hello Teensy 3.5 CAN Test."));
   CANbus.write(brakes_applied); //send command to be sure breaks are applied and throttle off 
+  CANbus.write(steering_setup); //send command to make sure steering is straight 
   CANbus.write(steering_straight); //send command to make sure steering is straight 
  // sysTimer.reset();
 }
@@ -127,6 +128,7 @@ void loop(void)
         turn_angle--; 
       }
       delay(60000); 
+      //set condition to start moving the cart again after turning 
       move_cart = 1;  
     }
   }
