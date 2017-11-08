@@ -28,9 +28,6 @@ Servo myservo;
 const int ledPin = 13;
 const int steerPin = 35;
 
-int brakeSpeed = 90;
-
- 
 byte throttle_val = 255;
 byte pot0 = B10101001; //bytes to select both pots
 int incomingByte; //user input 
@@ -41,61 +38,71 @@ void setup() {
   Serial.begin(9600);
   myservo.attach(steerPin); // Use PWM pin 14 to control Sabertooth.
 }
+
+void brakeOn() {
+  myservo.write(135); // turns on one direction 
+  delay(1000);
+  myservo.write(91); //stop motor 
+}
+
+void brakeOff() {
+  myservo.write(46); //turn the pther direction 
+  delay(750);
+  myservo.write(91); //stop 
+}
+
+
  
 void loop() {
   
   Wire.beginTransmission(0x28);
-  Wire.write(pot0);
+  Wire.write(B10101001);
   Wire.write(throttle_val);
   Wire.endTransmission();
- 
-  if (Serial.available() > 0) {
+  
 
+  if (Serial.available() > 0) {
     incomingByte = Serial.read();
 
-    input = incomingByte;
-    switch(input) {
-      case '1': //brake motor off
-        brakeSpeed = 90;
+    switch(incomingByte) {
+      case '1':
         throttle_val = 255;
-        Serial.println("Brake motor off");
+        myservo.write(91);
+        Serial.println("Brake motor killed");
         break;
-        
-      case '2': //brake motor full forward
-        brakeSpeed = 180;
+      case '2':
         throttle_val = 255;
-        Serial.println("Brake full forward");
+        brakeOn();
+        myservo.write(91);
+        Serial.println("Brake on");
         break;
-        
-      case '3': //brake motor full reverse
-        brakeSpeed = 0;
+      case '3':
         throttle_val = 255;
-        Serial.println("Brake full reverse");
-        break;
-        
+        brakeOff();
+        myservo.write(91);
+        Serial.println("Brake off");
       case '4': //throttle off
-        brakeSpeed = 90;
         throttle_val = 255;
         Serial.println("Throttle off");
         break;
         
       case '5': //throttle increment up
-        brakeSpeed = 90;
         throttle_val -= 10;
         Serial.println("Throttle increment up");
         break;
         
       case '6': //throttle increment down
-        brakeSpeed = 90;
         throttle_val += 10;
         Serial.println("Throttle increment down");
         break;
+      default:
+        myservo.write(91);
+        break;
     }
-    Serial.println(brakeSpeed);
-    myservo.write(brakeSpeed);
-    digitalWrite(ledPin, HIGH);
-    delay(100);
-   }//end if serial avail
+  Serial.println(throttle_val);
+  }
   delay(100);
 }
+
+
 
