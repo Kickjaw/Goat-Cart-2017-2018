@@ -19,24 +19,32 @@ Serial Monitor is Enabled on 9600 Baud Rate for Monitoring Value of Variable "va
  
 */
  
-#include <Wire.h>
+#include <SPI.h>
 #include <Servo.h>
 
 Servo myservo;
 
 //pins
 const int ledPin = 13;
-const int steerPin = 35;
+const int CS = 15;
 
-byte throttle_val = 255;
-byte pot0 = B10101001; //bytes to select both pots
+int throttle_val = 128;
+byte address = 0x00;
 int incomingByte; //user input 
 int input; //case for switch statment to select which pot to use and what to set the motor to
  
 void setup() {
-  Wire.begin();
+  pinMode (CS, OUTPUT);
+  SPI.begin();
   Serial.begin(9600);
-  myservo.attach(steerPin); // Use PWM pin 14 to control Sabertooth.
+}
+
+int digitalPotWrite(int value)
+{
+  digitalWrite(CS, LOW);
+  SPI.transfer(address);
+  SPI.transfer(value);
+  digitalWrite(CS, HIGH);
 }
 
 void brakeOn() {
@@ -53,14 +61,8 @@ void brakeOff() {
 
 
  
-void loop() {
-  
-  Wire.beginTransmission(0x28);
-  Wire.write(B10101001);
-  Wire.write(throttle_val);
-  Wire.endTransmission();
-  
-
+void loop() {  
+   digitalPotWrite(throttle_val);
   if (Serial.available() > 0) {
     incomingByte = Serial.read();
 
@@ -87,12 +89,23 @@ void loop() {
         break;
         
       case '5': //throttle increment up
-        throttle_val -= 10;
+        if (throttle_val < 10) {
+          throttle_val = 5;
+        }
+        else {
+          throttle_val -= 10; 
+        }
+          
         Serial.println("Throttle increment up");
         break;
         
       case '6': //throttle increment down
-        throttle_val += 10;
+        if (throttle_val > 118) {
+          throttle_val = 124;
+        }
+        else {
+          throttle_val += 10;
+        }
         Serial.println("Throttle increment down");
         break;
       default:
