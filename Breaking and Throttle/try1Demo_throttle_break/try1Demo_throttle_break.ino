@@ -18,7 +18,8 @@ void setup() {
   pinMode (CS, OUTPUT);
   SPI.begin();
   Serial.begin(9600);
-  throttle_val = 128; 
+  throttle_val = 25; 
+  digitalPotWrite(throttle_val);
 }
 
 int digitalPotWrite(int value)
@@ -46,24 +47,27 @@ void loop(){
     incomingByte = Serial.read();
     Serial.println(incomingByte);
     if (incomingByte == 'i'){  //whenever it receives command i do the Demo
-      Serial.println("in\n");
+      Serial.println("in");
       int i; 
       brakeOff(); //liberate break 
       //increase velocity three times to get to a relatively slow velocity
       for (i=0; i< 3; i++){ 
         Serial.println(throttle_val);
-        if (throttle_val <= 78) {
-          throttle_val = 70;
+        if (throttle_val < 0) {
+          throttle_val = 0;
+        }
+        else if (throttle_val >= 118){
+          throttle_val = 128;
         }
         else {
-          throttle_val -= 15; 
+          throttle_val += 10; 
         } 
         digitalPotWrite(throttle_val);
         delay(1000);
       }
-      Serial.println("wait 8 seconds \n");
+      Serial.println("wait 8 seconds");
       delay(8000); 
-      throttle_val = 128;
+      throttle_val = 25;
       digitalPotWrite(throttle_val);
       brakeOn();
       myservo.write(91);
