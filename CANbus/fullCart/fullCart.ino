@@ -200,9 +200,7 @@ void displayDistance(float feet)
 void loop(){ 
     //Local variables copies 
     float mphCopy;
-    float feetCopy;
-
-    
+    float feetCopy; 
     //Disable interrupts, copy critical, time-sensitive code, enable interrupts
     noInterrupts();
     mphCopy = mph;

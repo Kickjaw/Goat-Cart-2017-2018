@@ -18,7 +18,7 @@ void setup() {
   pinMode (CS, OUTPUT);
   SPI.begin();
   Serial.begin(9600);
-  throttle_val = 25; 
+  throttle_val = 70; 
   digitalPotWrite(throttle_val);
 }
 
@@ -67,7 +67,7 @@ void loop(){
       }
       Serial.println("wait 8 seconds");
       delay(8000); 
-      throttle_val = 25;
+      throttle_val = 50;
       digitalPotWrite(throttle_val);
       brakeOn();
       myservo.write(91);
