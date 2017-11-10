@@ -37,9 +37,13 @@ Servo brakeMotor;
 //pins
 const int ledPin = 13;
 const int CS = 15;
-const int brakePin = 35;
-const int steerPin = 36;
+const int brakePin = 36
+;
+const int steerPin = 35;
 
+//values
+int hard_brake_value = 90;
+int hard_steer_value = 90;
 int throttle_val;
 byte address = 0x00;
 int incomingByte; //user input 
@@ -72,7 +76,7 @@ void setup() {
   pinMode (CS, OUTPUT);
   SPI.begin();
   Serial.begin(9600);
-  throttle_val = 25; 
+  throttle_val = 0; 
   digitalPotWrite(throttle_val);
 }
 
@@ -84,16 +88,16 @@ int digitalPotWrite(int value)
   digitalWrite(CS, HIGH);
 }
 
-void turnLeft(){
-  steerMotor.write(98); //turn 1 dir
+void turnLeft(){ //update these values
+  steerMotor.write(65); //turn 1 dir
   delay(100);
-  steerMotor.write(96);  //stop
+  steerMotor.write(90);  //stop
 }
 
 void turnRight(){
-  steerMotor.write(90); //turn 1 dir
+  steerMotor.write(120); //turn 1 dir
   delay(100);
-  steerMotor.write(96);  //stop
+  steerMotor.write(90);  //stop
 }
 void brakeOn() {
   brakeMotor.write(135); // turns on one direction 
@@ -209,74 +213,96 @@ void loop(){
     //Display speed and distance after every 1000 ms (1 second)
     //displaySpeed(mphCopy);
     //displayDistance(feetCopy);
-    if (feetCopy - tempFeet > 10) { 
-      stop_cart = 1; 
-    }
     
-    if(stop_cart){ 
-      stop_cart = 0; 
-      throttle_val = 25;
-      digitalPotWrite(throttle_val);
-      brakeOn();
-      brakeMotor.write(91);
-      Serial.println(throttle_val);
-      Serial.println(feetCopy);
-      Serial.println("done");
-      if (repeats){
-        repeats--; 
-        int i; 
-        delay(3000); 
-        turnLeft();
-        delay(1000); 
-        brakeOff();
-        for (i=0; i< 3; i++){ 
-          Serial.println(throttle_val);
-          if (throttle_val < 0) {
-            throttle_val = 0;
-          }
-          else if (throttle_val >= 118){
-            throttle_val = 128;
-          }
-          else {
-            throttle_val += 10; 
-          } 
-          digitalPotWrite(throttle_val);
-          delay(1000);
-        }
-        delay(2000); 
-        throttle_val = 25;
-        digitalPotWrite(throttle_val);
-        brakeOn();
-        brakeMotor.write(91);
-        delay(3000);
-        Serial.write('i'); 
-      } 
-    }
    
     if (Serial.available() > 0) { 
-    incomingByte = Serial.read();
-    if (incomingByte == 'i'){  //whenever it receives command i do the Demo
-      tempFeet = feetCopy;
-      Serial.println("in");
-      int i; 
-      brakeOff(); //liberate break 
-      //increase velocity three times to get to a relatively slow velocity
-      for (i=0; i< 3; i++){ 
-        Serial.println(throttle_val);
-        if (throttle_val < 0) {
+      incomingByte = Serial.read();
+      switch(incomingByte) {
+        case 'i': //go forward
+          tempFeet = feetCopy;
+          int i; 
+          brakeOff(); //liberate break 
+          //increase velocity three times to get to a relatively slow velocity
+          for (i=0; i< 3; i++){ 
+            Serial.println(throttle_val);
+            if (throttle_val < 0) {
+              throttle_val = 0;
+            }
+            else if (throttle_val >= 118){
+              throttle_val = 128;
+            }
+            else {
+              throttle_val += 10; 
+            } 
+            digitalPotWrite(throttle_val);
+            delay(100);
+          }
+          Serial.println("going forward");
+          break;
+        case 'k': //stop
           throttle_val = 0;
-        }
-        else if (throttle_val >= 118){
-          throttle_val = 128;
-        }
-        else {
-          throttle_val += 10; 
-        } 
-        digitalPotWrite(throttle_val);
-        delay(1000);
+          brakeOn();
+          break;
+        case 'j': //turn left
+          turnLeft();
+          break;
+        case 'l': //turn right
+          turnRight();
+          break;
+        case 'u': //brake on
+          brakeOn();
+          break;
+        case 'o': //brake off
+          brakeOff();
+          break;
+        case 'q': //go ten feet forward
+          break;
+          
+        case '1': //granular brake control
+          hard_brake_value += 5;
+          brakeMotor.write(hard_brake_value);
+          break;
+        case '2': //granular brake control
+          hard_brake_value -= 5;
+          brakeMotor.write(hard_brake_value);
+          break;
+        case '3': //hard brake motor stop
+          hard_brake_value = 91;
+          brakeMotor.write(hard_brake_value);
+          break;
+        case '4': //granular steer left
+          hard_steer_value -= 5;
+          steerMotor.write(hard_steer_value);
+          break;
+        case '5': //granular steer right
+          hard_steer_value += 5;
+          steerMotor.write(hard_steer_value);
+          break;
+        case '6': //hard steer stop
+          hard_steer_value = 90;
+          steerMotor.write(hard_steer_value);
+          break;
+        case '7': //hard throttle incrment
+          throttle_val += 5;
+          digitalPotWrite(throttle_val);
+          break;
+        case '8': //hard throttle decriment
+          throttle_val -= 5;
+          digitalPotWrite(throttle_val);
+          break;
+        case '9': //hard thrttle shut off
+          throttle_val = 0;
+          digitalPotWrite(throttle_val);
+          break;
+          
       }
-       Serial.write('n'); 
-    } 
+      Serial.print("Hard brake value = ");
+      Serial.println(hard_brake_value);
+      Serial.print("Hard steer value = ");
+      Serial.println(hard_steer_value);
+      Serial.print("Throttle value = ");
+      Serial.println(throttle_val);
+      Serial.println();
   }
 }
 
