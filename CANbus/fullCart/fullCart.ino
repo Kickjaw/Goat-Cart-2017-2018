@@ -45,7 +45,8 @@ byte address = 0x00;
 int incomingByte; //user input 
 int input; //case for switch statment to select which pot to use and what to set the motor to
 
-
+  float tempFeet = 0; 
+  int repeats = 1;
 
 void setup() {
     /////INITIALIZE VAIRABLES/////
@@ -56,6 +57,8 @@ void setup() {
   circumference = 2*3.14*radius;
   debounceFlag = false;
   stillLow = false;
+  //other stuff 
+
   /////CONFIGURE PINS/////
   steerMotor.attach(steerPin);
   brakeMotor.attach(brakePin);
@@ -195,9 +198,11 @@ void displayDistance(float feet)
 
 
 void loop(){ 
-    //Local variables copies
+    //Local variables copies 
     float mphCopy;
     float feetCopy;
+
+    
     //Disable interrupts, copy critical, time-sensitive code, enable interrupts
     noInterrupts();
     mphCopy = mph;
@@ -206,7 +211,7 @@ void loop(){
     //Display speed and distance after every 1000 ms (1 second)
     //displaySpeed(mphCopy);
     //displayDistance(feetCopy);
-    if (feetCopy > 10) { 
+    if (feetCopy - tempFeet > 10) { 
       stop_cart = 1; 
     }
     
@@ -218,14 +223,42 @@ void loop(){
       brakeMotor.write(91);
       Serial.println(throttle_val);
       Serial.println(feetCopy);
-      
       Serial.println("done");
+      if (repeats){
+        repeats--; 
+        int i; 
+        delay(3000); 
+        turnLeft();
+        delay(1000); 
+        brakeOff();
+        for (i=0; i< 3; i++){ 
+          Serial.println(throttle_val);
+          if (throttle_val < 0) {
+            throttle_val = 0;
+          }
+          else if (throttle_val >= 118){
+            throttle_val = 128;
+          }
+          else {
+            throttle_val += 10; 
+          } 
+          digitalPotWrite(throttle_val);
+          delay(1000);
+        }
+        delay(2000); 
+        throttle_val = 25;
+        digitalPotWrite(throttle_val);
+        brakeOn();
+        brakeMotor.write(91);
+        delay(3000);
+        Serial.write('i'); 
+      } 
     }
-    delay(1000);
+   
     if (Serial.available() > 0) { 
     incomingByte = Serial.read();
-    Serial.println(incomingByte);
     if (incomingByte == 'i'){  //whenever it receives command i do the Demo
+      tempFeet = feetCopy;
       Serial.println("in");
       int i; 
       brakeOff(); //liberate break 
