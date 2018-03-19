@@ -1,4 +1,4 @@
-
+//this code was used to showcase the subsystems of the cart during th spark party on B term. CAN bus functionalities were not integrated yet. 
 #include <FlexCAN.h>
 
 //led pin number 
