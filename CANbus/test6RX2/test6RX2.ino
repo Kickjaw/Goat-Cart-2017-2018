@@ -8,7 +8,7 @@ int led3 = 29;
 FlexCAN CANbus(500000);
 static CAN_message_t msg,rxmsg;
 int txCount,rxCount;
-
+int counter; 
 
 
 void setup(void)
@@ -18,6 +18,10 @@ void setup(void)
   pinMode(led3, OUTPUT);
   digitalWrite(led2, 0);
   digitalWrite(led3, 0);
+  counter = 1; 
+  msg.id = 0x12; 
+  msg.len = 1; 
+  msg.buf[0] = 1; 
 }
 
 
@@ -34,10 +38,19 @@ void loop(void)
       Serial.println("Speed Increase rec");
       digitalWrite(led2, 0);
       digitalWrite(led3, 1);
+      counter++; 
     }
     else{
       Serial.println("nothing"); 
     }
     
+   }
+   if (counter%5 == 0){
+        txCount = 1; 
+        while ( txCount-- ) {
+        CANbus.write(msg);
+        Serial.println("Sent Update"); 
+        counter++;     
+        }
    }
 }

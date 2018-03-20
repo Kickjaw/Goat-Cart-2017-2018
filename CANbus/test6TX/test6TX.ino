@@ -5,7 +5,7 @@
 
 FlexCAN CANbus(500000);
 
-static CAN_message_t directions, calibrate_steering,center_steering, breaks_on, speed_increase, slow_down, odometry;
+static CAN_message_t rxmsg, directions, calibrate_steering,center_steering, breaks_on, speed_increase, slow_down, odometry;
 int txCount,rxCount;
 int led1 = 28;
 int led2 = 29; 
@@ -47,42 +47,40 @@ void setup(void)
 
 void loop(void)
 {
-//    while ( CANbus.read(rxmsg) ) {
-//      Serial.println("READ::::");
-//      int i; 
-//      uint8_t distance_traveled = 0; 
-//      for (i=0; i < rxmsg.len; i++){
-//        distance_traveled += rxmsg[i];
-//      }
-//      //hexDump( sizeof(rxmsg), (uint8_t *)&rxmsg );
-//     Serial.write(distance_traveled);
-//    }
+    while (CANbus.read(rxmsg) ) {
+         if (rxmsg.id == 0x12){ 
+          Serial.println("Update received");
+          digitalWrite(led1, 1);
+          delay(2000);  
+          digitalWrite(led1, 0);
+        }
+    }
 
      if (Serial.available() > 0) {
       incomingCommand = Serial.read();
        if (incomingCommand == 'i'){ //go forward
-        txCount = 5; 
+        txCount = 1; 
         while ( txCount-- ) {
         CANbus.write(speed_increase);
         Serial.println("speed_increase sent");     
         } 
        }
        else if (incomingCommand == 'm'){ //breaks on
-        txCount = 5; 
+        txCount = 1; 
         while ( txCount-- ) {
         CANbus.write(breaks_on);
         Serial.println("breaks_on sent");     
         }     
        }
        else if (incomingCommand == 'c'){
-        txCount = 5; 
+        txCount = 1; 
         while ( txCount-- ) {
         CANbus.write(center_steering);
         Serial.println("center_steering sent");     
         } 
        } 
        else if (incomingCommand == 'k'){
-        txCount = 5; 
+        txCount = 1; 
         while ( txCount-- ) {
         CANbus.write(calibrate_steering);
         Serial.println("calibrate_steering sent");     
