@@ -14,7 +14,7 @@ int incomingCommand;
 
 void setup(void)
 {
-  Serial.println(F("Hello Teensy 3.5 CAN Test."));
+  Serial.println(F("Hello Server Teensy."));
   Serial.begin(9600); 
   CANbus.begin();
   pinMode(led1, OUTPUT);
