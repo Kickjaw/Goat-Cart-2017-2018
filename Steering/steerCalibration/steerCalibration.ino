@@ -13,7 +13,7 @@
 Encoder steerEnc(22, 23);
 Servo steerMotor;
 const int ledPin = 13;
-const int steerPin = 36;
+const int steerPin = 37; //36
 const int limitR = 33; 
 const int limitL = 34; 
 
@@ -27,8 +27,8 @@ int incomingByte = 0;
 
 void setup() {
   Serial.begin(9600);
-  pinMode(limitR, INPUT); //limit switch R
-  pinMode(limitL, INPUT);
+  pinMode(limitR, INPUT_PULLUP); //limit switch R
+  pinMode(limitL, INPUT_PULLUP);
   pinMode(ledPin, OUTPUT);
   steerMotor.attach(steerPin);
   steerMotor.write(steerSpeed);
