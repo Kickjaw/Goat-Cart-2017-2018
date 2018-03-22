@@ -1,0 +1,60 @@
+VERSION2 from 2017-18 MQP Team, as of March 2018 this is the CAN board.
+
+Read more at the 2017-18 MQP report section 3.1
+
+
+The second version of the board fixed the errors found in the first PCB and further optimized the layout.
+The CAN transceiver was replaced with a SN65HVD23x 3.3-V CAN Bus Transceiver. [16]
+
+The second board has:
+•	Voltage regulation
+•	+12V to +5V 
+•	+5V to +3V3 (Teensy)
+•	2 Power LEDs
+•	+5V 
+•	+3V3 
+•	3 Programmable LEDs
+•	2 differential CAN ports (link together via daisy chain method)
+•	2 SPI Ports
+•	2 Serial Ports
+•	2 I2C Ports
+•	16 Digital Pins
+•	10 Analog Pins
+•	5 PWM Pins
+
+The primary goal of this design was to have many different methods of communication from the Teensy so that it could communicate to any type of sensor that a future team might use on the Goat Cart. Another reason for having numerous pins available was to allow a single Teensy to be used to control multiple subsystems. The only problem with the design was that, since the pins are software programmable, using a pin for a certain function could limit the availability of its other functions. An example of this is using pin 10 for PWM prevents its use as one of the SPI channels. The list of connector pinouts can be seen in Table 4. Figures 13 show the circuit and PCB of the second version of the CAN interface board.
+
+
+
+
+
+
+
+
+
+Table 5: Pinouts of the Teensy used in the CAN Interface Board
+Pinouts for the CAN Interface Board
+1.	GND 
+2.	3.3V
+3.	CAN L0
+4.	CAN H0
+5.	CAN L
+6.	CAN H
+7.	Pin 32 - D/A/RX4/CS1
+8.	Pin 31 -  D/A/TX4/SCK1
+9.	Pin 12 - D/MISO0
+10.	Pin 11 -  D/MISI0
+11.	Pin 10 - D/PWM/TX2/CS0
+12.	Pin 13 - D/SCK0	13.	Pin 33 - D/A/TX5
+14.	Pin 34 - D/A/RX5
+15.	Pin 37 - D/A/PWM/SCL1
+16.	Pin 38 - D/A/PWM/SDA1
+17.	Pin 18 - D/A/SDA0
+18.	Pin 19 - D/A/SCL0
+19.	Pin 22 - D/A/PWM
+20.	Pin 23 - D/A/PWM
+21.	Pin 1 -  D/TX1/MISO1
+22.	Pin 0 - D/RX1/MOSI1
+23.	3.3V
+24.	GND
+ 
